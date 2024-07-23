@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:  
+    tad.gitops.set/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.get/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.set/replicas: ".spec.replicas"
+    tad.gitops.get/replicas: ".spec.replicas" 
+  labels: 
+    app.kubernetes.io/instance: testjul23-chatbot
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name:  testjul23-chatbot
+    app.kubernetes.io/part-of: testjul23-chatbot  
+  name: testjul23-chatbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance:  testjul23-chatbot 
+  template:
+    metadata: 
+      labels:
+        app.kubernetes.io/instance:  testjul23-chatbot
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: testjul23-chatbot-model-config
+        image:  quay.io/redhat-ai-dev/ai-template-bootstrap-app:latest
+        name: app-inference
+        ports:
+        - containerPort: 8501
+        securityContext:
+          runAsNonRoot: true
